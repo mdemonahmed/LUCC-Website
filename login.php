@@ -1,5 +1,25 @@
+<?php    
+include "lib/session.php"; 
+Session::init();
+
+?>
+
+<?php include "config/config.php"; ?>
+<?php include "lib/Database.php"; ?>
+<?php include "helpers/Format.php"; ?>
+
+<?php 
+
+$db = new Database();
+$fm = new Format();
+
+?>
+
+
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en">  
 <head>
     <!-- Required meta tags -->
     <meta charset="UTF-8">
@@ -37,6 +57,7 @@
 	<![endif]-->
 
 </head>
+
 <body>
 <!-- PRELOADER START -->
 <div class="preloader">
@@ -46,14 +67,48 @@
     </div>
 </div>
 <!-- PRELOADER END -->
-
 <div class="container-login100">
     <div class="wrap-login100">
+    <?php
+
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+$username = $fm->validation($_POST['email']);
+$password = $fm->validation(md5($_POST['password']));
+
+$username = mysqli_real_escape_string($db->link, $username);
+$password = mysqli_real_escape_string($db->link, $password);
+
+$query = "SELECT * FROM tbl_user WHERE email = '$username' AND password = '$password'";
+$result = $db->select($query);
+if ($result != false) {
+    
+    $value = mysqli_fetch_array($result);
+    $row   = mysqli_num_rows($result);
+
+    if ($row > 0) {
+        Session::set("login", true);
+        Session::set("email", $value['email']);
+        Session::set("userId", $value['id']);
+        header("location:index.php");
+
+
+    }else{
+    echo "<span style='color:red; font-size:18px;'>NO result found..!!</span>";
+    }
+}else{
+    echo "<span style='color:red; font-size:18px;'>Email and password not matched..!!</span>";
+}
+
+
+}
+
+
+?>
         <div class="login100-pic js-tilt" data-tilt>
             <img src="images/img-01.png" alt="IMG">
         </div>
-
-        <form class="login100-form validate-form">
+        <form action="login.php" method="post" class="login100-form validate-form">
             <span class="login100-form-title">
                 Member Login
             </span>
@@ -67,7 +122,7 @@
             </div>
 
             <div class="wrap-input100 validate-input" data-validate = "Password is required">
-                <input class="input100" type="password" name="pass" placeholder="Password">
+                <input class="input100" type="password" name="password" placeholder="Password">
                 <span class="focus-input100"></span>
                 <span class="symbol-input100">
                     <i class="fa fa-lock" aria-hidden="true"></i>
