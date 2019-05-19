@@ -1,3 +1,14 @@
+<?php 
+
+include "config/config.php"; 
+include "lib/Database.php"; 
+include "helpers/Format.php"; 
+$db = new Database();
+$fm = new Format();
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -40,12 +51,12 @@
 
 <body id="registration">
 <!-- PRELOADER START -->
-<div class="preloader">
+<!-- <div class="preloader">
     <div class="la-ball-clip-rotate-pulse la-2x">
         <div></div>
         <div></div>
     </div>
-</div>
+</div> -->
 <!-- PRELOADER END -->
 <div class="form_wrapper">
     <div class="form_container">
@@ -54,22 +65,63 @@
         </div>
         <div class="row">
             <div class="">
-                <form>
+                <?php
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $firstname  = $_POST['firstname'];
+    $lastname    = $_POST['lastname'];
+    $birthday_day   = $_POST['birthday_day'];
+    $email   = $_POST['email'];
+    $mobile_number   = $_POST['mobile_number'];
+    $gender   = $_POST['gender'];
+    $student_id   = $_POST['student_id'];
+    $department   = $_POST['department'];
+    $batch   = $_POST['batch'];
+    $bio   = $_POST['bio'];
+    $password   = $_POST['password'];
+
+
+    if ($firstname == "" || $lastname == "" || $birthday_day == "" || $email == "" || $gender == "" || $student_id == "" || $department == "" || $batch == "" || $password == "") {
+        
+        echo "<span class='error'>flied must not be empty..!</span>";
+    }else{
+
+        $query = "INSERT INTO tbl_user(email, password, first_name, last_name, birthday, mobile_number, gender, student_id, department, batch, bio) 
+                          VALUES('$email', '$password', '$firstname', '$lastname', '$birthday_day', '$mobile_number', '$gender', '$student_id', '$department', '$batch', '$bio')";
+
+        $inserted_rows = $db->insert($query);
+        if ($inserted_rows) {
+            echo "<span class='success'>Your Registration successful..!</span>"; 
+        }else{
+            echo "<span class='error'>Your Registration not successful. Try Again</span>"; 
+        }
+    }
+
+
+
+
+
+
+
+
+}
+
+                ?>
+                <form action="registration.php" method="post">
                     <div class="row">
                         <div class="col_half">
                             <div class="input_field"> <span><i aria-hidden="true" class="fa fa-user"></i></span>
-                                <input type="text" name="name" placeholder="First Name" />
+                                <input type="text" name="firstname" placeholder="First Name" />
                             </div>
                         </div>
                         <div class="col_half">
                             <div class="input_field"> <span><i aria-hidden="true" class="fa fa-user"></i></span>
-                                <input type="text" name="name" placeholder="Last Name" required />
+                                <input type="text" name="lastname" placeholder="Last Name" required />
                             </div>
                         </div>
                     </div>
                     <div class="input_field dob">
                         <label>Date of Birth: </label>
-                        <select name="Birthday_day" id="Birthday_Day">
+                        <select name="birthday_day" id="Birthday_Day">
                             <option value="-1">Day:</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
@@ -167,7 +219,7 @@
                         <input type="email" name="email" placeholder="Email" required />
                     </div>
                     <div class="input_field"> <span><i aria-hidden="true" class="fas fa-mobile-alt"></i></span>
-                        <input type="tel" placeholder="Mobile Number"  name="Mobile_Number" maxlength="15">
+                        <input type="tel" placeholder="Mobile Number"  name="mobile_number" maxlength="15">
                     </div>
                     <div class="input_field radio_option">
                         <input type="radio" name="gender" id="rd1">
@@ -176,10 +228,10 @@
                         <label for="rd2">Female</label>
                     </div>
                     <div class="input_field"> <span><i aria-hidden="true" class="fas fa-id-card-alt"></i></span>
-                        <input type="text" placeholder="Student ID"  name="Student_ID" required>
+                        <input type="text" placeholder="Student ID"  name="student_id" required>
                     </div>
                     <div class="input_field select_option">
-                        <select required>
+                        <select name="department" required>
                             <option value="">Department</option>
                             <option value="CSE">CSE</option>
                             <option value="EEE">EEE</option>
@@ -191,7 +243,7 @@
                         <div class="select_arrow"></div>
                     </div>
                     <div class="input_field select_option">
-                        <select required>
+                        <select name="batch" required>
                             <option value="">Batch</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
@@ -248,7 +300,7 @@
                         <div class="select_arrow"></div>
                     </div>
                     <div class="input_field">
-                        <textarea placeholder="Bio" required></textarea>
+                        <textarea name="bio" placeholder="Bio" required></textarea>
                     </div>
                     <div class="input_field"> <span><i aria-hidden="true" class="fa fa-lock"></i></span>
                         <input type="password" name="password" placeholder="Password" required />
@@ -257,7 +309,7 @@
                         <input type="password" name="password" placeholder="Re-type Password" required />
                     </div>
                     <div class="input_field checkbox_option">
-                        <input type="checkbox" id="cb1">
+                        <input name="terms" type="checkbox" id="cb1">
                         <label for="cb1">I agree with terms and conditions</label>
                     </div>
                     <input class="button" type="submit" value="Register" />
